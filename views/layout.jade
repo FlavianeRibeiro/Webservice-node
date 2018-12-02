@@ -1,0 +1,22 @@
+doctype 
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+      div(class="navbar navbar-inverse navbar-fixed-top")
+          div(class="container")
+              div(class="navbar-header")
+                  a(href="/" class="navbar-brand") Mini-curso
+              div(class="navbar-collapse collapse" id="navbar-main")
+                  ul(class="nav navbar-nav")
+                    li(class="dropdown")
+                      a(href="/usuarios" class="navbar-brand") Usuario
+                    
+    div(class="container")
+      block content
+      
+      footer
+        div(class="container")
+          p Desenvolvido por LAW

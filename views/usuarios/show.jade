@@ -1,0 +1,18 @@
+extends ../layout
+
+block content
+  br
+  h1= value.nome
+  br
+  p= value._id
+  br
+  p= value.login
+  br
+  p= value.data_cad
+  br
+  form(method="POST", action="/usuarios/delete/#{value._id}",role="from")
+    input(type="hideen" name="_method" value="delete")
+    input(type="submit", value="Excluir", class="btn btn-primary")
+ 
+ br
+ a(href="/" title="Inicial") Voltar
