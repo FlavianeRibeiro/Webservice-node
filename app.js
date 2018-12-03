@@ -1,50 +1,58 @@
+var express          = require('express'),
+    path             = require('path'),
+	favicon          = require('static-favicon'),
+	logger           = require('morgan'),
+	cookieParser     = require('cookie-parser'),
+	bodyParser   	 = require('body-parser'),
+	session      	 = require('express-session'),
+	load         	 = require('express-load'),
+	mongoose         = require('mongoose'),
+	flash            = require('express-flash'),
+	moment           = require('moment'),
+	expressValidator = require('express-validator');
 
-/**
- * Module dependencies.
- */
-
-var express = require('express')
-  , load = require('express-load')// vai gerenciar 
-  , http = require('http')
-  , path = require('path');
-var app = express();
-var mongoose = require("mongoose");
-var db = mongoose.connect;
-const serverFavicon = require("serve-favicon");
-const serverStatic = require("serve-static");
-const methodOverride = require("method-override");
-const bodyParser = require("body-parser");
-const logger = require("morgan");
-const errorHandler = require("errorhandler");
-
-mongoose.connect('mongodb://flavianeribeiro:melancia022@ds123834.mlab.com:23834/produtospdc', function(err){
-  if(err){
-    console.log('Erro ao concetar ao mongodb'+err);
-  }else{
-    console.log('concetado ao Banco ...')
-  }
+//conexão com o mongodb
+mongoose.connect('mongodb://localhost/acadtec', function(err){
+	if(err){
+		console.log("Erro ao conectar no mongodb: "+err);
+	}else{
+		console.log("Conexão com o mongodb efetuada com sucesso!");
+	}
 });
 
-// all environments
-app.set('port', process.env.PORT || 8080);
-app.set('views', __dirname + '/views');
+var app = express();
+
+//middleware
+var erros = require('./middleware/erros');
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.use(serverFavicon(path.join(__dirname, 'public/favicon.jpg')));
+
+app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(methodOverride());
-//app.use(app.router);
-app.use(serverStatic(path.join(__dirname, 'public')));
+app.use(bodyParser.urlencoded());
+app.use(expressValidator());
+app.use(cookieParser());
+app.use(session({ secret: 'aulanodejsacadtec009933' }));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
-// development only
-if ('development' == app.get('env')) {
-  app.use(errorHandler());
-}
+//helpers
+app.use(function(req,res,next){
+	res.locals.session  = req.session.usuario;
+	res.locals.isLogged = req.session.usuario ? true : false;
+	res.locals.moment   = moment;
+	next();
+});
 
-// carregar os models onde estará os projetos
 load('models').then('controllers').then('routes').into(app);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+//middleware
+//app.use(erros.notfound);
+//app.use(erros.serverError);
+
+app.listen(8080, function() {
+    console.log('Express server listening on port 3000');
 });
